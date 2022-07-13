@@ -1,7 +1,7 @@
 <template>
   <section class="modal">
     <nav>
-      <h4>Adicionar carro</h4>
+      <h4>Cadastrar novo carro</h4>
       <button @click="closeModal()">X</button>
     </nav>
     <form class="form_new_car">
@@ -59,8 +59,7 @@
       </div>
     </form>
     <footer>
-      <input type="reset" value="LIMPAR" />
-      <button @click="newPost">CONCLUIR</button>
+      <button @click="valifateForm()">CONCLUIR</button>
     </footer>
   </section>
 </template>
@@ -72,7 +71,7 @@ export default {
   name: "ModalForm",
   data() {
     return {
-      url: "https://my-json-server.typicode.com/willianWarren/backendAPI/cars",
+      url: "http://localhost:8080/api/cars",
       name: "",
       marca: "",
       cor: "",
@@ -89,16 +88,41 @@ export default {
     closeModal() {
       this.$emit("closeModal");
     },
-    async newPost() {
+    valifateForm() {
+      if (
+        this.name &&
+        this.marca &&
+        this.cor &&
+        this.ano &&
+        this.portas &&
+        this.cv &&
+        this.alarme &&
+        this.cambio &&
+        this.tetoSolar &&
+        this.compudadordeBordo
+      ) {
+        alert("Novo carro cadastrado com sucesso");
+        this.newCar();
+        this.closeModal();
+      } else {
+        alert("Algum campo não etá preenchido");
+      }
+    },
+    async newCar() {
       try {
         const payload = {
-          nome: "Corsa",
-          marca: "Fiat",
-          cor: "vermelho",
-          ano: "2001",
+          nome: this.name,
+          marca: this.marca,
+          cor: this.cor,
+          ano: this.ano,
+          portas: this.portas,
+          cv: this.cv,
+          alarme: this.alarme,
+          cambio: this.cambio,
+          tetoSolar: this.tetoSolar,
+          compudadordeBordo: this.compudadordeBordo,
         };
         await axios.post(this.url, payload);
-        this.closeModal();
       } catch (error) {
         console.log(error);
       }
@@ -133,8 +157,8 @@ export default {
   border: none;
   border-radius: 5px;
 
-  box-shadow: 0px 0px 1px 1100px rgba(0, 0, 0, 0.568);
-
+  box-shadow: 0px 0px 1px 1100px rgba(0, 0, 0, 0.53);
+  background-image: linear-gradient(to top, #30cfd0 0%, #330867 100%);
   position: absolute;
   top: 50%;
   left: 50%;
