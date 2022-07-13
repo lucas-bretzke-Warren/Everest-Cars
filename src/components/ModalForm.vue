@@ -38,7 +38,7 @@
         <input
           type="text"
           v-model="alarme"
-          placeholder="possui, sim / não ???"
+          placeholder="possui,  true / false ?"
         />
       </div>
       <div class="content">
@@ -46,7 +46,7 @@
         <input
           type="text"
           v-model="tetoSolar"
-          placeholder="possui, sim / não ???"
+          placeholder="possui,  true / false ?"
         />
       </div>
       <div class="content">
@@ -54,7 +54,7 @@
         <input
           type="text"
           v-model="compudadordeBordo"
-          placeholder="possui, sim / não ???"
+          placeholder="possui,  true / false ?"
         />
       </div>
     </form>
