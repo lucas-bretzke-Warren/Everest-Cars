@@ -17,9 +17,9 @@ createServer({
       portas: "2",
       cv: "70",
       cambio: "manual",
-      alarme: "false",
-      tetoSolar: "false",
-      computadorDeBordo: "false"
+      alarme: "não tem",
+      tetoSolar: "não tem",
+      computadorDeBordo: "não tem"
     })
     server.create("car", {
       nome: "Gol g5",
@@ -29,9 +29,9 @@ createServer({
       portas: "4",
       cv: "75",
       cambio: "manual",
-      alarme: "true",
-      tetoSolar: "false",
-      computadorDeBordo: "false"
+      alarme: "tem",
+      tetoSolar: "não tem",
+      computadorDeBordo: "não tem"
     })
     server.create("car", {
       nome: "Mercedes c180",
@@ -41,9 +41,9 @@ createServer({
       portas: "4",
       cv: "130",
       cambio: "manual",
-      alarme: "true",
-      tetoSolar: "true",
-      computadorDeBordo: "true"
+      alarme: "tem",
+      tetoSolar: "tem",
+      computadorDeBordo: "tem"
     })
   },
   routes() {
@@ -57,10 +57,10 @@ createServer({
       let car = JSON.parse(request.requestBody)
       return schema.cars.create(car)
     })
-    this.patch("/cars/:id", (schema, request) => {
+    this.put("/cars/:id", (schema, request) => {
+      let data = JSON.parse(request.requestBody)
       let id = request.params.id
-      let attrs = this.normalizedRequestAttrs()
-      return schema.contacts.find(id).update(attrs)
+      return schema.cars.find(id).update(data)
     })
 
     this.delete('/cars/:id', (schema, request) => {
