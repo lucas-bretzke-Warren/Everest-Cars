@@ -1,60 +1,72 @@
 <template>
   <section class="modal">
     <nav>
-      <h4>Cadastrar novo carro</h4>
+      <h4>{{ titleModal }}</h4>
       <button @click="closeModal()">X</button>
     </nav>
     <form class="form_new_car">
       <div class="content">
         <label for="">Nome do carro</label>
-        <input type="text" placeholder="nome?" v-model="name" required />
+        <input type="text" placeholder="nome?" v-model="car.nome" />
       </div>
       <div class="content">
         <label for="">Marca</label>
-        <input type="text" v-model="marca" placeholder="Reno,Fiat,Volvo..." />
+        <input
+          type="text"
+          v-model="car.marca"
+          placeholder="Reno,Fiat,Volvo..."
+        />
       </div>
       <div class="content">
         <label for="">Cor</label>
-        <input type="text" v-model="cor" placeholder="branco,cinza,rosa..." />
+        <input
+          type="text"
+          v-model="car.cor"
+          placeholder="branco,cinza,rosa..."
+        />
       </div>
       <div class="content">
         <label for="">Ano</label>
-        <input type="text" v-model="ano" placeholder="##/##/####" />
+        <input type="text" v-model="car.ano" placeholder="##/##/####" />
       </div>
       <div class="content">
         <label for=""> Quantidade de portas</label>
-        <input type="text" v-model="portas" placeholder="digite um numero" />
+        <input
+          type="text"
+          v-model="car.portas"
+          placeholder="digite um numero"
+        />
       </div>
       <div class="content">
         <label for="">CV</label>
-        <input type="text" v-model="cv" placeholder="quantos CV ?" />
+        <input type="text" v-model="car.cv" placeholder="quantos CV ?" />
       </div>
       <div class="content">
         <label for="">Câmbio</label>
-        <input type="text" v-model="cambio" placeholder="automático / manual" />
+        <input
+          type="text"
+          v-model="car.cambio"
+          placeholder="automático / manual"
+        />
       </div>
       <div class="content">
         <label for="">Alarme</label>
-        <input
-          type="text"
-          v-model="alarme"
-          placeholder="possui,  true / false ?"
-        />
+        <input type="text" v-model="car.alarme" placeholder="tem / não tem ?" />
       </div>
       <div class="content">
         <label for="">Teto solar</label>
         <input
           type="text"
-          v-model="tetoSolar"
-          placeholder="possui,  true / false ?"
+          v-model="car.tetoSolar"
+          placeholder="tem / não tem ?"
         />
       </div>
       <div class="content">
         <label for="">Computador de bordo</label>
         <input
           type="text"
-          v-model="compudadordeBordo"
-          placeholder="possui,  true / false ?"
+          v-model="car.computadorDeBordo"
+          placeholder="tem / não tem ?"
         />
       </div>
     </form>
@@ -68,42 +80,60 @@
 import axios from "axios";
 
 export default {
-  name: "ModalForm",
+  nome: "ModalForm",
   data() {
     return {
       url: "http://localhost:8080/api/cars",
-      name: "",
-      marca: "",
-      cor: "",
-      ano: "",
-      portas: "",
-      cv: "",
-      alarme: "",
-      cambio: "",
-      tetoSolar: "",
-      compudadordeBordo: "",
+      car: {
+        nome: "",
+        marca: "",
+        cor: "",
+        ano: "",
+        portas: "",
+        cv: "",
+        alarme: "",
+        cambio: "",
+        tetoSolar: "",
+        computadorDeBordo: "",
+      },
     };
+  },
+  computed: {
+    titleModal() {
+      return this.isCreateCar
+        ? "Cadastrar novo carro"
+        : `Atualizar carro: ${this.car.nome}`;
+    },
+  },
+  props: {
+    isCreateCar: { type: Boolean },
+    carProp: { type: Object },
+    dataCars: { tpe: String },
+  },
+  watch: {
+    carProp() {
+      this.car = this.carProp;
+    },
   },
   methods: {
     closeModal() {
       this.$emit("closeModal");
     },
-    valifateForm() {
+
+    async valifateForm() {
       if (
-        this.name &&
-        this.marca &&
-        this.cor &&
-        this.ano &&
-        this.portas &&
-        this.cv &&
-        this.alarme &&
-        this.cambio &&
-        this.tetoSolar &&
-        this.compudadordeBordo
+        this.car.nome &&
+        this.car.marca &&
+        this.car.cor &&
+        this.car.ano &&
+        this.car.portas &&
+        this.car.cv &&
+        this.car.alarme &&
+        this.car.cambio &&
+        this.car.tetoSolar &&
+        this.car.computadorDeBordo
       ) {
-        alert("Novo carro cadastrado com sucesso");
         this.newCar();
-        this.closeModal();
       } else {
         alert("Algum campo não etá preenchido");
       }
@@ -111,20 +141,23 @@ export default {
     async newCar() {
       try {
         const payload = {
-          nome: this.name,
-          marca: this.marca,
-          cor: this.cor,
-          ano: this.ano,
-          portas: this.portas,
-          cv: this.cv,
-          alarme: this.alarme,
-          cambio: this.cambio,
-          tetoSolar: this.tetoSolar,
-          compudadordeBordo: this.compudadordeBordo,
+          nome: this.car.nome,
+          marca: this.car.marca,
+          cor: this.car.cor,
+          ano: this.car.ano,
+          portas: this.car.portas,
+          cv: this.car.cv,
+          alarme: this.car.alarme,
+          cambio: this.car.cambio,
+          tetoSolar: this.car.tetoSolar,
+          computadorDeBordo: this.car.computadorDeBordo,
         };
+        alert("Sucesso!!!");
         await axios.post(this.url, payload);
       } catch (error) {
         console.log(error);
+      } finally {
+        this.closeModal();
       }
     },
   },
