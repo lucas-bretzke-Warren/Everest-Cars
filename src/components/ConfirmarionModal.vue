@@ -13,6 +13,7 @@
  
  <script>
 import axios from "axios";
+
 export default {
   name: "confirmationModal",
   data() {
@@ -31,10 +32,11 @@ export default {
     async deleteCar(id) {
       try {
         await axios.delete(`${this.url}/${id}`);
-        this.closeModal();
-        this.getCars();
       } catch (error) {
         console.log(error);
+      } finally {
+        this.getCars()
+        this.closeModal();
       }
     },
   },
