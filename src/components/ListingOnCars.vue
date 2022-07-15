@@ -1,7 +1,7 @@
 <template>
   <div>
     <nav>Lista de carros</nav>
-    <header><button @click="openFormNewCar()">POST</button></header>
+    <header><button @click="createNewCar()">Adicionar carro</button></header>
 
     <section class="container-list">
       <ul class="titles">
@@ -11,83 +11,114 @@
       <ul v-for="car in dataCars" :key="car.id">
         <li>{{ car.nome }}</li>
         <li>{{ car.ano }}</li>
-        <li><button class="btn-put" @click="patchCar()">PUT</button></li>
         <li>
-          <button class="btn-delete" @click="deleteCar(car.id)">DELETE</button>
+          <button class="btn-put" @click="updateCar(car.id, car)">
+            Editar carro
+          </button>
+        </li>
+        <li>
+          <button class="btn-delete" @click="openConfirmationModal(car.id)">
+            Deletar carro
+          </button>
         </li>
       </ul>
-      <ModalForm v-show="form_new_car" @closeModal="closeFormNewCar()" />
-      <!-- <section v-show="confirm_delete" class="modal-confirm-delete">
-        <h4>Tem certeza</h4>
-        <h4>que deseja deletar este item?</h4>
-        <div>
-          <button @click="closeModal()">Cancelar</button
-          ><button @click="deleteCar()">Sim</button>
-        </div>
-      </section> -->
     </section>
+    <ModalForm
+      v-show="form_new_car"
+      @closeModal="closeFormNewCar()"
+      :isCreateCar="isCreate"
+      :dataCars="dataCars"
+      :carProp="car"
+    />
+    <ConfirmationModal
+      :id="carId"
+      @closeModal="closeConfirmationModal"
+      v-show="confirmationModal"
+    />
   </div>
 </template>
 
 <script>
 import axios from "axios";
-
 import ModalForm from "../components/ModalForm.vue";
+import ConfirmationModal from "../components/ConfirmarionModal.vue";
 
 export default {
   name: "ListingOnCars",
   components: {
     ModalForm,
+    ConfirmationModal,
   },
   data() {
     return {
       url: "http://localhost:8080/api/cars",
       dataCars: [],
-      confirm_delete: false,
       form_new_car: false,
+      confirmationModal: false,
+      isCreate: null,
+      carId: "",
+      car: {
+        nome: "",
+        marca: "",
+        cor: "",
+        ano: "",
+        portas: "",
+        cv: "",
+        alarme: "",
+        cambio: "",
+        tetoSolar: "",
+        computadorDeBordo: "",
+      },
     };
   },
   methods: {
-    openFormNewCar() {
+    openFormModal() {
       this.form_new_car = true;
     },
     closeFormNewCar() {
       this.form_new_car = false;
       this.getCars();
     },
-    openModal() {
-      this.confirm_delete = true;
+    openConfirmationModal(id) {
+      this.confirmationModal = true;
+      this.carId = id;
     },
-    closeModal() {
-      this.confirm_delete = false;
+    closeConfirmationModal() {
+      this.confirmationModal = false;
+      this.getCars();
     },
 
     async getCars() {
       try {
         const response = await axios.get(this.url);
         this.dataCars = response.data.cars;
-        console.log(this.dataCars);
       } catch (error) {
         console.log(error);
       }
     },
-
-    async patchCar() {
-      const editItemsTo = {
-        name: "Virou uma carroça",
+    createNewCar() {
+      this.car = {
+        nome: "",
+        marca: "",
+        cor: "",
+        ano: "",
+        portas: "",
+        cv: "",
+        alarme: "",
+        cambio: "",
+        tetoSolar: "",
+        computadorDeBordo: "",
       };
-      try {
-        await axios.patch(this.url, editItemsTo);
-      } catch (error) {
-        console.log(error);
-      }
+      this.isCreate = true;
+      this.openFormModal();
+      this.getCars();
     },
-
-    async deleteCar(id) {
+    async updateCar(id, car) {
+      this.car = car;
+      this.isCreate = false;
+      this.openFormModal();
       try {
-        await axios.delete(`${this.url}/${id}`);
-        this.getCars();
-        this.confirm_delete = false;
+        await axios.put(`${this.url}/${id}`, car);
       } catch (error) {
         console.log(error);
       }
@@ -168,7 +199,9 @@ header {
       font-size: 14px;
 
       .btns {
-        padding: 5px 10px;
+        width: 95px;
+        padding: 5px 5px;
+        margin-left: 10px;
         font-size: 14px;
         border: none;
         border-radius: 3px;
@@ -193,45 +226,6 @@ header {
       }
       .btn-delete:hover {
         transform: translateZ(10px) scale(1.1);
-      }
-    }
-  }
-  .modal-confirm-delete {
-    width: 300px;
-    height: 100px;
-
-    display: grid;
-    align-items: center;
-    justify-content: center;
-    border-radius: 5px;
-
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    right: -50%;
-    transform: translate(-50%, -50%);
-
-    background-color: white;
-    color: black;
-    box-shadow: 0px 0px 1px 1100px rgba(77, 77, 77, 0.151);
-    div {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      button {
-        padding: 7px 13px;
-        margin: 0px 3px;
-        border: none;
-        border-radius: 3px;
-        cursor: pointer;
-        color: white;
-        background-color: #02343fd2;
-      }
-      button:hover {
-        transform: translateZ(5px) scale(1.1);
-        background-color: #02343f;
-        border-radius: 3px;
       }
     }
   }
