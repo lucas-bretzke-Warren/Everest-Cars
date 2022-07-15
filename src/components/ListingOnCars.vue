@@ -1,7 +1,7 @@
 <template>
   <div>
     <nav>Lista de carros</nav>
-    <header><button @click="createNewCar()">Adicionar carro</button></header>
+    <header><button @click="setCreateNewCar">Adicionar carro</button></header>
 
     <section class="container-list">
       <ul class="titles">
@@ -12,12 +12,12 @@
         <li>{{ car.nome }}</li>
         <li>{{ car.ano }}</li>
         <li>
-          <button class="btn-put" @click="updateCarSelected(car.id, car)">
+          <button class="btn-put" @click="setCarToUpdate(car.id, car)">
             Editar carro
           </button>
         </li>
         <li>
-          <button class="btn-delete" @click="openConfirmationModal(car.id)">
+          <button class="btn-delete" @click="openModal(car.id)">
             Deletar carro
           </button>
         </li>
@@ -25,18 +25,18 @@
     </section>
     <ModalForm
       v-show="form_new_car"
-      @closeModal="closeFormNewCar()"
-      @emitUpdateCar="updateCar"
-      @getCars="getCars"
+      @closeModal="closeFormModal()"
+      :isCreateProp="isCreate"
       :carIdProp="carId"
-      :isCreateCar="isCreate"
       :carProp="car"
+      @updateCar="updateCar"
+      @createNewCar="createNewCar"
     />
     <ConfirmationModal
       :id="carId"
-      @closeModal="closeConfirmationModal"
       @getCars="getCars"
-      v-show="confirmationModal"
+      @closeModal="closeModal"
+      v-show="checkAction"
     />
   </div>
 </template>
@@ -57,7 +57,7 @@ export default {
       url: "http://localhost:8080/api/cars",
       dataCars: [],
       form_new_car: false,
-      confirmationModal: false,
+      checkAction: false,
       isCreate: null,
       carId: "",
       car: {
@@ -72,22 +72,21 @@ export default {
         tetoSolar: "",
         computadorDeBordo: "",
       },
-      
     };
   },
   methods: {
     openFormModal() {
       this.form_new_car = true;
     },
-    closeFormNewCar() {
+    closeFormModal() {
       this.form_new_car = false;
     },
-    openConfirmationModal(id) {
-      this.confirmationModal = true;
+    openModal(id) {
+      this.checkAction = true;
       this.carId = id;
     },
-    closeConfirmationModal() {
-      this.confirmationModal = false;
+    closeModal() {
+      this.checkAction = false;
     },
 
     async getCars() {
@@ -98,7 +97,8 @@ export default {
         console.log(error);
       }
     },
-    createNewCar() {
+
+    setCreateNewCar() {
       this.car = {
         nome: "",
         marca: "",
@@ -114,20 +114,31 @@ export default {
       this.isCreate = true;
       this.openFormModal();
     },
-    async updateCar(car, id) {
+    async createNewCar(car) {
       try {
-        await axios.put(`${this.url}/${id}`, car);
-        this.getCar();
-        this.closeFormNewCar();
-      } catch (error) {
-        console.log(error);
+        await axios.post(this.url, car);
+      } catch (err) {
+        console.log(err);
+      } finally {
+        this.closeFormModal();
+        this.getCars();
       }
     },
-    async updateCarSelected(id, car) {
-      this.car = car;
+    setCarToUpdate(id, car) {
+      this.car = Object.assign({}, car);
       this.carId = id;
       this.isCreate = false;
       this.openFormModal();
+    },
+    async updateCar(car, id) {
+      try {
+        await axios.put(`${this.url}/${id}`, car);
+      } catch (err) {
+        console.log("Deu ruim :(");
+      } finally {
+        this.closeFormModal();
+        this.getCars();
+      }
     },
   },
   async mounted() {
@@ -218,7 +229,6 @@ header {
       .btns:hover {
         transform: translateZ(10px) scale(1.1);
       }
-
       .btn-put {
         .btns();
         background-color: #f2aa4c;
@@ -232,6 +242,45 @@ header {
       }
       .btn-delete:hover {
         transform: translateZ(10px) scale(1.1);
+      }
+    }
+  }
+  .modal-confirm-delete {
+    width: 300px;
+    height: 100px;
+
+    display: grid;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    right: -50%;
+    transform: translate(-50%, -50%);
+
+    background-color: white;
+    color: black;
+    box-shadow: 0px 0px 1px 1100px rgba(77, 77, 77, 0.151);
+    div {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      button {
+        padding: 7px 13px;
+        margin: 0px 3px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        color: white;
+        background-color: #02343fd2;
+      }
+      button:hover {
+        transform: translateZ(5px) scale(1.1);
+        background-color: #02343f;
+        border-radius: 3px;
       }
     }
   }
