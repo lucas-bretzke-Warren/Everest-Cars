@@ -25,10 +25,14 @@ export default {
     closeModal() {
       this.$emit("closeModal");
     },
+    getCars() {
+      this.$emit("getCars");
+    },
     async deleteCar(id) {
       try {
         await axios.delete(`${this.url}/${id}`);
         this.closeModal();
+        this.getCars();
       } catch (error) {
         console.log(error);
       }
