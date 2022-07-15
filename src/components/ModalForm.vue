@@ -1,7 +1,7 @@
 <template>
   <section class="modal">
     <nav>
-      <h4>{{ titleModal }}</h4>
+      <h4>{{ getModalTitle }}</h4>
       <button @click="closeModal()">X</button>
     </nav>
     <form class="form_new_car">
@@ -51,7 +51,11 @@
       </div>
       <div class="content">
         <label for="">Alarme</label>
-        <input type="text" v-model="car.alarme" placeholder="tem / não tem ?" />
+        <input
+          type="text"
+          v-model="car.alarme"
+          placeholder="tem / não tem ?"
+        />
       </div>
       <div class="content">
         <label for="">Teto solar</label>
@@ -77,10 +81,8 @@
 </template>
 
 <script>
-import axios from "axios";
-
 export default {
-  nome: "ModalForm",
+  name: "ModalForm",
   data() {
     return {
       url: "http://localhost:8080/api/cars",
@@ -99,17 +101,15 @@ export default {
     };
   },
   computed: {
-    titleModal() {
-      return this.isCreateCar
-        ? "Cadastrar novo carro"
-        : `Atualizar carro: ${this.car.nome}`;
+    getModalTitle() {
+      return this.isCreateProp ? "Cadastrar novo carro" : "Atualizar carro";
     },
   },
-  props: {
-    isCreateCar: { type: Boolean },
-    carProp: { type: Object },
-    carIdProp: { type: String },
-  },
+    props: {
+      isCreateProp: { type: Boolean },
+      carProp: { type: Object },
+      carIdProp: { type: String },
+    },
   watch: {
     carProp() {
       this.car = this.carProp;
@@ -120,14 +120,12 @@ export default {
       this.$emit("closeModal");
     },
     emitUpdateCar() {
-      this.$emit("emitUpdateCar", this.car, this.carIdProp);
-      this.closeModal();
-      this.getCars();
+      this.$emit("updateCar", this.car, this.carIdProp);
     },
-    getCars() {
-      this.$emit("getCars");
+    emitCreateNewCar() {
+      this.$emit("createNewCar", this.car);
     },
-    async valifateForm() {
+    valifateForm() {
       if (
         this.car.nome &&
         this.car.marca &&
@@ -139,34 +137,14 @@ export default {
         this.car.cambio &&
         this.car.tetoSolar &&
         this.car.computadorDeBordo
-      )
-        if (this.isCreateCar) {
-          this.newCar();
+      ) {
+        if (this.isCreateProp) {
+          this.emitCreateNewCar();
         } else {
           this.emitUpdateCar();
         }
-    },
-    async newCar() {
-      try {
-        const payload = {
-          nome: this.car.nome,
-          marca: this.car.marca,
-          cor: this.car.cor,
-          ano: this.car.ano,
-          portas: this.car.portas,
-          cv: this.car.cv,
-          alarme: this.car.alarme,
-          cambio: this.car.cambio,
-          tetoSolar: this.car.tetoSolar,
-          computadorDeBordo: this.car.computadorDeBordo,
-        };
-        alert("Sucesso!!!");
-        await axios.post(this.url, payload);
-        this.getCars();
-      } catch (error) {
-        console.log(error);
-      } finally {
-        this.closeModal();
+      } else {
+        alert("Algum campo não etá preenchido");
       }
     },
   },
