@@ -12,7 +12,7 @@
         <li>{{ car.nome }}</li>
         <li>{{ car.ano }}</li>
         <li>
-          <button class="btn-put" @click="updateCar(car.id, car)">
+          <button class="btn-put" @click="updateCarSelected(car.id, car)">
             Editar carro
           </button>
         </li>
@@ -26,8 +26,10 @@
     <ModalForm
       v-show="form_new_car"
       @closeModal="closeFormNewCar()"
+      @emitUpdateCar="updateCar"
+      @getCars="getCars"
+      :carIdProp="carId"
       :isCreateCar="isCreate"
-      :dataCars="dataCars"
       :carProp="car"
     />
     <ConfirmationModal
@@ -69,6 +71,7 @@ export default {
         tetoSolar: "",
         computadorDeBordo: "",
       },
+      
     };
   },
   methods: {
@@ -77,7 +80,6 @@ export default {
     },
     closeFormNewCar() {
       this.form_new_car = false;
-      this.getCars();
     },
     openConfirmationModal(id) {
       this.confirmationModal = true;
@@ -113,15 +115,20 @@ export default {
       this.openFormModal();
       this.getCars();
     },
-    async updateCar(id, car) {
-      this.car = car;
-      this.isCreate = false;
-      this.openFormModal();
+    async updateCar(car, id) {
       try {
         await axios.put(`${this.url}/${id}`, car);
+        this.getCar();
+        this.closeFormNewCar();
       } catch (error) {
         console.log(error);
       }
+    },
+    async updateCarSelected(id, car) {
+      this.car = car;
+      this.carId = id;
+      this.isCreate = false;
+      this.openFormModal();
     },
   },
   async mounted() {
