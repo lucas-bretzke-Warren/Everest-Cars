@@ -35,6 +35,7 @@
     <ConfirmationModal
       :id="carId"
       @closeModal="closeConfirmationModal"
+      @getCars="getCars"
       v-show="confirmationModal"
     />
   </div>
@@ -87,7 +88,6 @@ export default {
     },
     closeConfirmationModal() {
       this.confirmationModal = false;
-      this.getCars();
     },
 
     async getCars() {
@@ -113,7 +113,6 @@ export default {
       };
       this.isCreate = true;
       this.openFormModal();
-      this.getCars();
     },
     async updateCar(car, id) {
       try {
