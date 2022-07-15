@@ -108,7 +108,7 @@ export default {
   props: {
     isCreateCar: { type: Boolean },
     carProp: { type: Object },
-    dataCars: { tpe: String },
+    carIdProp: { type: String },
   },
   watch: {
     carProp() {
@@ -119,7 +119,14 @@ export default {
     closeModal() {
       this.$emit("closeModal");
     },
-
+    emitUpdateCar() {
+      this.$emit("emitUpdateCar", this.car, this.carIdProp);
+      this.closeModal();
+      this.getCars();
+    },
+    getCars() {
+      this.$emit("getCars");
+    },
     async valifateForm() {
       if (
         this.car.nome &&
@@ -132,11 +139,12 @@ export default {
         this.car.cambio &&
         this.car.tetoSolar &&
         this.car.computadorDeBordo
-      ) {
-        this.newCar();
-      } else {
-        alert("Algum campo não etá preenchido");
-      }
+      )
+        if (this.isCreateCar) {
+          this.newCar();
+        } else {
+          this.emitUpdateCar();
+        }
     },
     async newCar() {
       try {
@@ -154,6 +162,7 @@ export default {
         };
         alert("Sucesso!!!");
         await axios.post(this.url, payload);
+        this.getCars();
       } catch (error) {
         console.log(error);
       } finally {
